@@ -19,9 +19,14 @@
     header { margin-bottom: 2.5rem; }
     header h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
     header p { color: var(--text-muted); }
-    .empty { background: var(--surface); border: 1px dashed var(--border); border-radius: 10px; padding: 3rem 2rem; text-align: center; color: var(--text-muted); }
-    .empty p { margin-bottom: 0.4rem; }
-    .empty .label { font-size: 0.8rem; }
+    .guide-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .guide-item a { display: flex; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+    .guide-item a:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+    .guide-icon { font-size: 1.5rem; flex-shrink: 0; padding-top: 0.1rem; }
+    .guide-title { font-weight: 700; font-size: 0.97rem; margin-bottom: 0.25rem; }
+    .guide-desc { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.5rem; }
+    .guide-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .tag { font-size: 0.68rem; font-weight: 600; background: var(--accent-light); color: var(--accent); padding: 0.12rem 0.4rem; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -31,10 +36,24 @@
     <h1>PPL Exam Prep ✈️</h1>
     <p>Private Pilot License written exam — FAA study material and notes.</p>
   </header>
-  <div class="empty">
-    <p>Nothing here yet.</p>
-    <p class="label">Coming soon — ACS, Pilot's Handbook of Aeronautical Knowledge, weather, regs.</p>
-  </div>
+  <ul class="guide-list">
+    <li class="guide-item">
+      <a href="ppl-ground-course.html">
+        <span class="guide-icon">&#9992;&#65039;</span>
+        <div class="guide-body">
+          <div class="guide-title">Premium Private Pilot Ground Course</div>
+          <div class="guide-desc">Josh Campbell's full ground course — 11 chapters, 64 lessons with YouTube videos, reading assignments from FAA handbooks, per-lesson quizzes, section quizzes, and practice tests. Progress is tracked in your browser.</div>
+          <div class="guide-tags">
+            <span class="tag">Aerodynamics</span>
+            <span class="tag">Airspace</span>
+            <span class="tag">Navigation</span>
+            <span class="tag">Weather</span>
+            <span class="tag">Regs</span>
+          </div>
+        </div>
+      </a>
+    </li>
+  </ul>
 </div>
 </body>
 </html>
