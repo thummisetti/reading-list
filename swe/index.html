@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWE Notes — Reading List</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f8f6;
+      --surface: #ffffff;
+      --border: #e5e3df;
+      --text: #1a1917;
+      --text-muted: #6b6860;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container { max-width: 680px; margin: 0 auto; }
+
+    .breadcrumb {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    header { margin-bottom: 2.5rem; }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    header p { color: var(--text-muted); }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .guide-list { list-style: none; }
+
+    .guide-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+    }
+
+    .guide-item a {
+      display: flex;
+      gap: 1rem;
+      padding: 1.1rem 1.3rem;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 10px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .guide-item:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .guide-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+    .guide-body { flex: 1; }
+
+    .guide-title {
+      font-size: 0.97rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .guide-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+    .guide-tags { margin-top: 0.5rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .tag {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #f1f0ee;
+      color: #4a4845;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="breadcrumb">
+    <a href="../">Reading List</a> &rsaquo; Software Engineering
+  </nav>
+
+  <header>
+    <h1>Software Engineering</h1>
+    <p>Production SWE patterns and concepts — grounded in real codebases.</p>
+  </header>
+
+  <p class="section-label">Guides</p>
+
+  <ul class="guide-list">
+
+    <li class="guide-item">
+      <a href="de-to-swe-guide.html">
+        <span class="guide-icon">🔌</span>
+        <div class="guide-body">
+          <div class="guide-title">From DE to SWE — FastAPI, API Design & Auth</div>
+          <div class="guide-desc">A full walkthrough of FastAPI route definitions, dependency injection, Pydantic v2 models, JWT auth, API versioning, pagination strategies, and the factory pattern. All examples from the Octus Data API codebase.</div>
+          <div class="guide-tags">
+            <span class="tag">FastAPI</span>
+            <span class="tag">Auth</span>
+            <span class="tag">API Design</span>
+            <span class="tag">Patterns</span>
+          </div>
+        </div>
+      </a>
+    </li>
+
+  </ul>
+
+</div>
+</body>
+</html>

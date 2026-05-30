@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>From DE to SWE — Data API Reading Guide</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f8f6;
+      --surface: #ffffff;
+      --border: #e5e3df;
+      --text: #1a1917;
+      --text-muted: #6b6860;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --code-bg: #282c34;
+      --tag-bg: #f1f0ee;
+      --tag-text: #4a4845;
+      --sidebar-width: 240px;
+      --content-max: 720px;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      padding: 2rem 1.25rem;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .content {
+      max-width: var(--content-max);
+      margin: 0 auto;
+    }
+
+    /* ── Sidebar nav ────────────────────────────────────────────── */
+    .nav-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .nav-list { list-style: none; }
+
+    .nav-list li { margin-bottom: 0.1rem; }
+
+    .nav-list a {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.3rem 0.5rem;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+      line-height: 1.4;
+    }
+
+    .nav-list a:hover { background: var(--tag-bg); color: var(--text); }
+    .nav-list a.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+    .nav-list .sub { padding-left: 1.25rem; }
+
+    .nav-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1rem 0;
+    }
+
+    /* ── Typography ─────────────────────────────────────────────── */
+    .page-header { margin-bottom: 3rem; }
+
+    .page-header h1 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header .subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      margin-right: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .intro-box {
+      background: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2.5rem;
+      font-size: 0.92rem;
+    }
+
+    .intro-box p + p { margin-top: 0.5rem; }
+
+    section { margin-bottom: 3.5rem; }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      scroll-margin-top: 2rem;
+    }
+
+    h2 .section-num {
+      color: var(--accent);
+      margin-right: 0.4rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      scroll-margin-top: 2rem;
+    }
+
+    p { margin-bottom: 1rem; }
+
+    strong { font-weight: 700; }
+
+    em { font-style: italic; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    ul, ol {
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    li { margin-bottom: 0.3rem; }
+
+    /* ── Callout boxes ──────────────────────────────────────────── */
+    .callout {
+      background: var(--tag-bg);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      font-size: 0.92rem;
+    }
+
+    .callout.warning {
+      background: #fff7ed;
+      border-left: 3px solid #f97316;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .callout.analogy {
+      background: #f0fdf4;
+      border-left: 3px solid #22c55e;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .callout .callout-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    /* ── Code ───────────────────────────────────────────────────── */
+    pre {
+      margin: 1.25rem 0;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    pre code { font-family: var(--font-mono); }
+
+    code:not(pre code) {
+      font-family: var(--font-mono);
+      font-size: 0.83em;
+      background: var(--tag-bg);
+      color: #b91c1c;
+      padding: 0.15em 0.35em;
+      border-radius: 3px;
+    }
+
+    .code-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+      margin-top: 1.25rem;
+    }
+
+    /* ── Tables ─────────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--tag-bg);
+      font-weight: 700;
+      text-align: left;
+      padding: 0.55rem 0.9rem;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.5rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Flow diagram ───────────────────────────────────────────── */
+    .flow {
+      background: var(--code-bg);
+      color: #abb2bf;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+    }
+
+    .flow .comment { color: #5c6370; }
+    .flow .highlight { color: #61afef; }
+
+    /* ── Section divider ────────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    /* ── Reading list ───────────────────────────────────────────── */
+    .reading-item {
+      display: flex;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+
+    .reading-item:last-child { border-bottom: none; }
+
+    .reading-num {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--border);
+      width: 2rem;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .reading-body { flex: 1; }
+    .reading-body strong { display: block; margin-bottom: 0.15rem; }
+    .reading-body span { font-size: 0.88rem; color: var(--text-muted); }
+
+    /* ── Mobile ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      body { display: block; }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main { padding: 1.5rem 1.1rem 5rem; }
+
+      .page-header h1 { font-size: 1.5rem; }
+
+      h2 { font-size: 1.25rem; }
+
+      pre { font-size: 0.76rem; }
+
+      table { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ─────────────────────────────────────────────────── -->
+<nav class="sidebar">
+  <p class="nav-title">Contents</p>
+  <ul class="nav-list">
+    <li><a href="#big-picture">1. The Big Picture</a></li>
+    <li><a href="#fastapi">2. FastAPI Fundamentals</a></li>
+    <ul class="nav-list">
+      <li><a href="#routes" class="sub">Defining Routes</a></li>
+      <li><a href="#async" class="sub">Async Handlers</a></li>
+      <li><a href="#pydantic" class="sub">Pydantic v2 Models</a></li>
+      <li><a href="#di" class="sub">Dependency Injection</a></li>
+    </ul>
+    <li><a href="#auth">3. Auth</a></li>
+    <ul class="nav-list">
+      <li><a href="#authn-authz" class="sub">Authn vs Authz</a></li>
+      <li><a href="#jwt" class="sub">JWT Validation</a></li>
+      <li><a href="#roles" class="sub">Token Roles</a></li>
+      <li><a href="#dep-chain" class="sub">Dependency Chain</a></li>
+      <li><a href="#auth-flow" class="sub">Auth Flow Downstream</a></li>
+      <li><a href="#system-items" class="sub">SYSTEM Data Items</a></li>
+    </ul>
+    <li><a href="#api-design">4. API Design</a></li>
+    <ul class="nav-list">
+      <li><a href="#versioning" class="sub">Versioning Strategy</a></li>
+      <li><a href="#catalog" class="sub">Catalog Pattern</a></li>
+      <li><a href="#pagination" class="sub">Pagination</a></li>
+      <li><a href="#public-internal" class="sub">Public vs Internal</a></li>
+    </ul>
+    <li><a href="#factory">5. Factory Pattern</a></li>
+    <ul class="nav-list">
+      <li><a href="#the-problem" class="sub">The Problem</a></li>
+      <li><a href="#resolution" class="sub">How It Resolves</a></li>
+      <li><a href="#abc" class="sub">Abstract Base Class</a></li>
+    </ul>
+    <hr class="nav-divider">
+    <li><a href="#end-to-end">End-to-End Trace</a></li>
+    <li><a href="#reading-next">What to Read Next</a></li>
+  </ul>
+</nav>
+
+<!-- ── Main content ────────────────────────────────────────────── -->
+<main class="main">
+<article class="content">
+
+  <header class="page-header">
+    <span class="tag">FastAPI</span>
+    <span class="tag">Auth</span>
+    <span class="tag">API Design</span>
+    <span class="tag">Patterns</span>
+    <h1>From DE to SWE</h1>
+    <p class="subtitle">A guided tour through the Data API codebase</p>
+  </header>
+
+  <div class="intro-box">
+    <p><strong>Who this is for:</strong> A senior Data Engineer who knows Python well and wants to understand how production FastAPI services are designed and wired together. All examples are pulled from real code in this repo.</p>
+    <p><strong>How long:</strong> A focused day or two. Each section is self-contained — read in order the first time, use as a reference after.</p>
+  </div>
+
+  <!-- ── Section 1 ─────────────────────────────────────────────── -->
+  <section id="big-picture">
+    <h2><span class="section-num">1</span>The Big Picture</h2>
+
+    <p>Before diving into code, here's what happens when a client hits <code>POST /api/v3/data/list</code>:</p>
+
+    <div class="flow">
+HTTP Request
+  → FastAPI router matches the path           <span class="comment">web/api/router.py</span>
+  → Dependency injection resolves auth        <span class="comment">web/api/auth.py</span>
+  → Route handler runs                        <span class="comment">web/api/v3/data/views.py</span>
+      → Converts API request → RetrieverInput
+      → RetrieverFactory.fetch_single()       <span class="comment">retriever/RetrieverFactory.py</span>
+          → Looks up which retriever handles these data items  <span class="comment">(DB lookup)</span>
+          → Checks permissions
+          → Instantiates the right retriever  <span class="comment">(e.g. IntelDataRetriever)</span>
+          → Calls retriever.fetch()           <span class="comment">retriever/intel_data_retriever/</span>
+              → Queries the database
+              → Returns rows
+      → Converts RetrieverOutput → APIResponse
+  → FastAPI serializes response model → JSON</div>
+
+    <p>Each arrow is a layer you'll understand by the end of this guide.</p>
+  </section>
+
+  <!-- ── Section 2 ─────────────────────────────────────────────── -->
+  <section id="fastapi">
+    <h2><span class="section-num">2</span>FastAPI Fundamentals</h2>
+
+    <h3 id="routes">Defining Routes</h3>
+    <p>FastAPI routes are Python functions decorated with HTTP method decorators. The framework parses JSON bodies, validates types, and serializes responses automatically.</p>
+
+    <p class="code-label">web/api/v3/data/views.py</p>
+    <pre><code class="language-python">from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.post(
+    "/v3/data/list",
+    response_model=APIResponse,           # FastAPI validates + serializes the return value
+    description="V3 Data API with row-based pagination...",
+    openapi_extra={"x-sdk-include": True},  # Custom metadata for SDK generation
+)
+async def get_data_v3(
+    data_request: V3APIRequest,           # Body — FastAPI deserializes + validates via Pydantic
+    auth_ctx: AuthContext = Depends(resolve_auth),  # Injected dependency (more below)
+) -> APIResponse:
+    ...
+    return api_results</code></pre>
+
+    <p><strong>What FastAPI is doing for you:</strong></p>
+    <ul>
+      <li>Reads the JSON body → calls <code>V3APIRequest(**body_dict)</code> → raises 422 if validation fails</li>
+      <li>Calls <code>resolve_auth()</code> and passes the result as <code>auth_ctx</code></li>
+      <li>Takes your return value, calls <code>APIResponse(**return_value)</code>, serializes to JSON</li>
+      <li>Generates OpenAPI docs at <code>/api/docs</code> automatically from the type hints</li>
+    </ul>
+
+    <div class="callout analogy">
+      <p class="callout-label">DE Analogy</p>
+      <p>Think of it like a stored procedure signature — you declare input/output types and the framework handles the plumbing.</p>
+    </div>
+
+    <h3 id="async">Async Handlers</h3>
+    <p>Every handler in this codebase is <code>async def</code> because all the expensive work (DB queries, HTTP calls to the auth service) is I/O-bound.</p>
+
+    <pre><code class="language-python"># Synchronous — blocks the thread while waiting for DB
+def get_data(request):
+    result = db.query(...)   # thread sits idle here
+    return result
+
+# Asynchronous — releases the thread while waiting, handles other requests
+async def get_data(request):
+    result = await db.query(...)   # yields control, resumes when DB responds
+    return result</code></pre>
+
+    <p><strong>The practical rule:</strong> If a function does I/O (DB, HTTP, Redis), it must be <code>async def</code> and you <code>await</code> it. If it's pure computation, <code>def</code> is fine.</p>
+
+    <div class="callout warning">
+      <p class="callout-label">Watch out</p>
+      <p>Calling <code>time.sleep()</code> inside an async handler freezes the entire service. Use <code>await asyncio.sleep()</code> instead. FastAPI runs async handlers on a single event loop — blocking it blocks every concurrent request.</p>
+    </div>
+
+    <div class="callout analogy">
+      <p class="callout-label">DE Analogy</p>
+      <p>Same concept as non-blocking I/O in Spark or async reading in Pandas. The process doesn't block waiting for data to arrive.</p>
+    </div>
+
+    <h3 id="pydantic">Pydantic v2 Models</h3>
+    <p>Pydantic is the validation layer. Every request body and response is a Pydantic model — a Python class that declares field types and validates them at instantiation.</p>
+
+    <p class="code-label">web/api/v3/data/schema.py</p>
+    <pre><code class="language-python">from pydantic import Field
+from data_api.web.api.v2.data.schema import APIRequest
+
+class V3APIRequest(APIRequest):         # Inherits ids, data_item_names, page_token, filters, sort
+    page_size: int = Field(
+        100,                            # default value
+        ge=1,                           # validation: must be >= 1
+        description="Number of rows to retrieve per page.",
+    )
+    params: dict[str, Any] | None = None   # Optional dict for dataset-specific params</code></pre>
+
+    <p>The parent <code>APIRequest</code> looks like this:</p>
+    <pre><code class="language-python">class APIRequest(BaseModel):
+    ids: list[APIIdentifier] | None = None
+    data_item_ids: list[int] | None = None
+    data_item_names: list[str] | None = None
+    page_size: int = Field(1000, ge=1)
+    page_token: str | None = None
+    sort: Sort | None = None
+    filters: FilterGroup | None = None</code></pre>
+
+    <p><strong>Key Pydantic behaviors to know:</strong></p>
+    <ul>
+      <li>Fields with no default are <strong>required</strong> — FastAPI returns 422 if they're missing</li>
+      <li><code>X | None = None</code> makes a field optional with a <code>None</code> default</li>
+      <li><code>Field(default, ge=1, le=10000)</code> adds validation constraints</li>
+      <li>Pydantic v2 is strict about types — <code>"100"</code> will not silently coerce to <code>100</code> unless configured</li>
+      <li>Inheritance works exactly as expected: <code>V3APIRequest</code> has all fields of <code>APIRequest</code> plus <code>params</code></li>
+    </ul>
+
+    <h3 id="di">Dependency Injection</h3>
+    <p>This is FastAPI's most important concept. <code>Depends()</code> lets you declare that a handler needs a resolved value — FastAPI calls the dependency function and passes the result automatically.</p>
+
+    <pre><code class="language-python"># The dependency — resolves auth, returns an AuthContext
+async def resolve_auth(
+    request: Request,
+    _credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
+) -> AuthContext:
+    # ... validates the Bearer token, returns an AuthContext dataclass
+    return ctx
+
+# The handler — receives the already-resolved AuthContext
+async def get_data_v3(
+    data_request: V3APIRequest,
+    auth_ctx: AuthContext = Depends(resolve_auth),  # FastAPI calls resolve_auth, injects result
+) -> APIResponse:
+    ...</code></pre>
+
+    <p>Dependencies can themselves depend on other things. FastAPI builds a full dependency graph and resolves it top-down:</p>
+
+    <div class="flow">
+get_data_v3
+  └── resolve_auth           <span class="comment">(validates Bearer token)</span>
+        └── _bearer_scheme   <span class="comment">(extracts the token string from headers)</span></div>
+
+    <div class="callout analogy">
+      <p class="callout-label">DE Analogy</p>
+      <p>Think of it like a task DAG in Airflow — each dependency is a node, FastAPI resolves them in order, and the final function only runs when all upstream nodes are satisfied. If any node raises an exception, the chain short-circuits and returns an error response.</p>
+    </div>
+
+    <p><strong>Benefit for testing:</strong> In tests you can override a dependency to return a fake <code>AuthContext</code> without touching any real auth logic. The endpoint handler doesn't care where its <code>auth_ctx</code> came from.</p>
+  </section>
+
+  <!-- ── Section 3 ─────────────────────────────────────────────── -->
+  <section id="auth">
+    <h2><span class="section-num">3</span>Auth</h2>
+
+    <h3 id="authn-authz">Authentication vs Authorization</h3>
+    <p>These are two different questions that DAPI handles at different layers:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Concept</th><th>Question it answers</th><th>Where in DAPI</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Authentication</strong></td><td>Is this token valid? Was it issued by Octus Auth? Has it expired?</td><td><code>auth.py → resolve_auth()</code></td></tr>
+          <tr><td><strong>Authorization</strong></td><td>Even if valid, is this user allowed to access <em>this specific data</em>?</td><td><code>RetrieverFactory → validate_permissions()</code> and data item status checks</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="jwt">JWT Validation</h3>
+    <p>Every token is a JWT (JSON Web Token) — a signed, base64-encoded blob containing claims: user ID, role, features, product grants, etc.</p>
+
+    <p class="code-label">web/api/auth.py</p>
+    <pre><code class="language-python">auth = OctusAuth(issuer=settings.auth_issuer)   # initialized once at module load
+
+async def resolve_auth(request: Request, ...) -> AuthContext:
+    token = auth_header[len("Bearer "):]
+    result = await auth.validate_token_async(token)   # calls the Octus auth SDK
+
+    if not result.is_valid:
+        raise UnauthorizedException("Invalid bearer token")
+
+    # If valid, extract claims from the principal
+    ctx.principal = result.principal
+    ctx.application_id = result.principal.get_application_id()
+    ctx.features = _parse_int_claims(result.principal.get_features())
+    ctx.product_grants = _parse_int_claims(result.principal.get_product_grants())</code></pre>
+
+    <p>The <code>OctusAuth</code> SDK handles the cryptographic verification — checking the token's signature against the issuer's public keys. If the token was tampered with, expired, or issued by a different service, <code>result.is_valid</code> is <code>False</code>.</p>
+
+    <p><strong>What's inside a JWT claim in this system:</strong></p>
+    <ul>
+      <li><code>role</code>: User | ClientApi | ServiceApp | ServiceAsUser | Agent</li>
+      <li><code>sub</code>: user ID</li>
+      <li><code>email</code>: user's email</li>
+      <li><code>application_id</code>: service ID (for ServiceApp/ServiceAsUser tokens)</li>
+      <li><code>features</code>: list of feature flag IDs the user has</li>
+      <li><code>product_grants</code>: list of product access IDs the user has</li>
+    </ul>
+
+    <h3 id="roles">Token Roles and the <code>is_public</code> Flag</h3>
+
+    <pre><code class="language-python"># data_api/web/api/auth.py
+
+PUBLIC_ROLES = ("User", "ClientApi")
+INTERNAL_ROLES = ("ServiceApp", "ServiceAsUser", "Agent")
+
+# During resolve_auth:
+role = result.principal.get_role()
+ctx.is_public = role in PUBLIC_ROLES   # True for external clients, False for internal services</code></pre>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Token Role</th><th>Issued to</th><th>is_public</th><th>INTERNAL_EXTERNAL fields</th><th>INTERNAL fields</th></tr></thead>
+        <tbody>
+          <tr><td><code>User</code></td><td>End users</td><td>✓ True</td><td>✓</td><td>✗</td></tr>
+          <tr><td><code>ClientApi</code></td><td>External API consumers</td><td>✓ True</td><td>✓</td><td>✗</td></tr>
+          <tr><td><code>ServiceApp</code></td><td>Internal services</td><td>✗ False</td><td>✓</td><td>✓</td></tr>
+          <tr><td><code>ServiceAsUser</code></td><td>Internal service + user context</td><td>✗ False</td><td>✓</td><td>✓</td></tr>
+          <tr><td><code>Agent</code></td><td>Admin impersonation</td><td>✗ False</td><td>✓</td><td>✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The <code>is_public</code> flag flows through the entire request — from auth → retriever input → DB query — determining which data items come back in the response.</p>
+
+    <h3 id="dep-chain">Dependency Chain</h3>
+    <p>Three levels of auth restriction are built by chaining dependencies on top of each other:</p>
+
+    <div class="flow">
+resolve_auth                 → optional, no error if no token
+  └── resolve_auth_required  → must have a valid token (any role)
+        └── resolve_user_id  → must be a User token specifically</div>
+
+    <pre><code class="language-python"># Level 1: Optional — returns empty AuthContext if no token
+async def resolve_auth(request, _credentials=Depends(_bearer_scheme)) -> AuthContext:
+    ctx = AuthContext()
+    if token_present:
+        result = await auth.validate_token_async(token)
+        if result.is_valid:
+            ctx.principal = result.principal
+            # ... populate ctx
+    return ctx   # returns even with no token
+
+# Level 2: Requires any valid token
+async def resolve_auth_required(
+    auth_ctx: AuthContext = Depends(resolve_auth)
+) -> AuthContext:
+    if auth_ctx.principal is None:
+        raise DataApiException(status_code=401, message="Authentication required")
+    return auth_ctx
+
+# Level 3: Requires specifically a User token (not a service token)
+async def resolve_user_id(
+    auth_ctx: AuthContext = Depends(resolve_auth_required)
+) -> str:
+    if auth_ctx.principal.get_role() != "User":
+        raise DataApiException(status_code=401, message="Must pass user token")
+    return auth_ctx.principal.get_user_id()</code></pre>
+
+    <p><strong>Which endpoints use which:</strong></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Auth dependency</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><code>POST /v3/data/list</code></td><td><code>resolve_auth</code></td><td>Both public and internal can query; no token required</td></tr>
+          <tr><td><code>POST /v2/file-upload</code></td><td><code>resolve_user_id</code></td><td>Only human users can upload, not automated services</td></tr>
+          <tr><td><code>POST /v1/data/delete</code></td><td><code>resolve_user_id</code></td><td>Destructive action — must be a real user, auditable</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="auth-flow">How Auth Context Flows Downstream</h3>
+    <p>The <code>AuthContext</code> object is passed down through the stack so retrievers and DB queries can make access decisions:</p>
+
+    <p class="code-label">web/api/v3/data/views.py</p>
+    <pre><code class="language-python">async def get_data_v3(data_request, auth_ctx=Depends(resolve_auth)):
+    set_auth_context_vars(auth_ctx)    # writes to Python context vars (async thread-local equivalent)
+    ...
+    retriever_request = await v3_api_request_to_retriever_input(
+        data_request,
+        retriever_factory,
+        auth_ctx,                      # auth_ctx passed into retriever input
+    )</code></pre>
+
+    <p>At the retriever level, each retriever can enforce its own permission rules:</p>
+
+    <p class="code-label">retriever/intel_data_retriever/intel_data_retriever.py</p>
+    <pre><code class="language-python">async def validate_permissions(self, permissions: Permissions) -> None:
+    if not permissions.product_grants:
+        raise NoProductGrants(
+            "You are not permissioned to access intel data."
+        )
+    if (
+        permissions.is_public_request
+        and ProductGrant.INTEL_DATA.value not in permissions.product_grants
+    ):
+        raise NoProductGrants(
+            "You are not permissioned to access intel data."
+        )</code></pre>
+
+    <p>The <code>product_grants</code> value here originated as a claim in the JWT → extracted in <code>resolve_auth()</code> → stored on <code>AuthContext</code> → passed as <code>RetrieverInput</code> → arrives here.</p>
+
+    <div class="callout analogy">
+      <p class="callout-label">DE Analogy</p>
+      <p>Row-level security in a data warehouse. The same query runs for everyone, but a filter is applied based on who's asking. Here it's enforced at the application layer instead of the DB layer, but the concept is identical.</p>
+    </div>
+
+    <h3 id="system-items">Authorization: SYSTEM Data Items</h3>
+    <p>Beyond role-based checks, some data items are <code>SYSTEM</code> status. Even a valid internal token can't access them unless the calling application has been explicitly allowlisted:</p>
+
+    <p class="code-label">retriever/RetrieverFactory.py</p>
+    <pre><code class="language-python">async def _validate_system_data_item_access(self, data_item_ids):
+    application_id = application_id_ctx_var.get()
+
+    # No application_id at all → can't access SYSTEM items
+    if not application_id:
+        if any(id in system_data_items for id in data_item_ids):
+            raise ForbiddenException("Forbidden to access requested data item(s)")
+        return
+
+    # Has application_id → check if this app is explicitly allowlisted
+    allowed_ids = await get_allowed_system_data_item_ids(application_id)
+    for data_item_id in data_item_ids:
+        if data_item.status == SYSTEM and data_item_id not in allowed_ids:
+            raise ForbiddenException("Forbidden to access requested data item(s)")</code></pre>
+
+    <p>This is a per-application allowlist stored in the DB (<code>application_to_allowed_data_item</code>). So <code>IDENTIFIER_TRANSLATION_CUSIP</code> is only accessible to specific services explicitly granted permission — even if they have a valid internal token.</p>
+  </section>
+
+  <!-- ── Section 4 ─────────────────────────────────────────────── -->
+  <section id="api-design">
+    <h2><span class="section-num">4</span>API Design Concepts</h2>
+
+    <h3 id="versioning">Versioning Strategy</h3>
+    <p>The API has three versions running simultaneously: v1, v2, v3. This is a common pattern — you can't change a public API without breaking existing callers, so you add a version instead of modifying.</p>
+
+    <p class="code-label">web/api/router.py</p>
+    <pre><code class="language-python">api_router = APIRouter()
+api_router.include_router(data_v1.router, tags=["data"])   # v1 routes
+api_router.include_router(data_v2.router, tags=["data"])   # v2 routes
+api_router.include_router(data_v3.router, tags=["data"])   # v3 routes</code></pre>
+
+    <p>All three are registered at startup and run simultaneously. Older clients keep calling v1/v2; new clients use v3.</p>
+
+    <p><strong>Why v3 was needed — two reasons:</strong></p>
+    <ul>
+      <li><strong>Pagination model changed.</strong> V1/V2 page size counts <em>data item values</em> (fields), not rows. If you request 5 fields for 100 records, that's 500 values — a page_size of 1000 gives you 200 records. Confusing. V3 paginates by rows, which is what every caller actually wants. Changing V2's behavior would silently break existing callers.</li>
+      <li><strong>New <code>params</code> field needed.</strong> Dataset-specific parameters (e.g. <code>{"date": "2024-01-01"}</code>) didn't exist in v2. Adding them to v2 would require updating every existing v2 caller's request schema.</li>
+    </ul>
+
+    <pre><code class="language-python"># V3 schema extends V2 with only two changes:
+class V3APIRequest(APIRequest):
+    page_size: int = Field(100, ge=1)    # V2 default was 1000; V3 is 100
+    params: dict[str, Any] | None = None  # new in V3</code></pre>
+
+    <div class="callout">
+      <p><strong>General principle:</strong> When you can extend without breaking, extend. When you must break, version. Never silently change behavior — callers built automated pipelines on V2's behavior; surprising them with a different page count would corrupt their data.</p>
+    </div>
+
+    <h3 id="catalog">The Catalog Pattern</h3>
+    <p>The catalog endpoint (<code>GET /api/v1/dataset-catalog/</code>) is a <strong>self-describing API</strong> — it tells callers what's available without them reading docs or source code.</p>
+
+    <pre><code class="language-json">// GET /api/v1/dataset-catalog/?dataset_type_name=INSTRUMENT
+{
+  "catalog_datasets": [{
+    "dataset_type_id": 12,
+    "dataset_type_name": "INSTRUMENT",
+    "supported_identifiers": ["instrument_id", "entity_id"],
+    "unique_identifiers": ["instrument_id"],
+    "data_items": [
+      {"data_item_id": 42, "data_item_name": "INSTRUMENT_NAME", "data_item_type": "Text"},
+      {"data_item_id": 43, "data_item_name": "MATURITY_DATE", "data_item_type": "Date"}
+    ]
+  }]
+}</code></pre>
+
+    <p>This pattern is valuable when the set of available datasets/fields changes frequently — callers can discover what they can query at runtime rather than hardcoding field names. The public catalog automatically filters to only <code>INTERNAL_EXTERNAL</code> data items when <code>is_public=True</code>.</p>
+
+    <h3 id="pagination">Pagination — Two Approaches</h3>
+    <p>Pagination returns large result sets in pages. DAPI has two implementations, which is a good case study in trade-offs.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>V1 / V2</th><th>V3</th></tr></thead>
+        <tbody>
+          <tr><td><strong>What "page size" counts</strong></td><td>Individual field values</td><td>Rows</td></tr>
+          <tr><td><strong>Page size 100, 5 fields/row</strong></td><td>~20 rows</td><td>100 rows</td></tr>
+          <tr><td><strong>Multi-retriever support</strong></td><td>Yes (iterates retrievers)</td><td>No (single dataset only)</td></tr>
+          <tr><td><strong>Token format</strong></td><td><code>{retriever_idx}|{cursor}</code> encoded</td><td>Opaque base64 cursor</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The page token is always <strong>opaque</strong> — clients treat it as a black box. Copy it from one response into the next request's <code>page_token</code> field. Internally it encodes enough state to resume the query exactly where it left off.</p>
+
+    <pre><code class="language-python"># Typical pagination loop (Python)
+page_token = None
+all_results = []
+
+while True:
+    resp = requests.post(url, json={
+        "dataset_type_id": 11,
+        "page_size": 100,
+        **({"page_token": page_token} if page_token else {})
+    }, headers=headers)
+
+    data = resp.json()
+    all_results.extend(data["results"])
+
+    page_token = data.get("next_page_token")
+    if not page_token:
+        break</code></pre>
+
+    <div class="callout analogy">
+      <p class="callout-label">DE Analogy</p>
+      <p>Same concept as a database cursor — the cursor tracks "where we are" in the result set so the next query picks up from there. Identical to how you'd paginate through a Snowflake query result or use <code>LIMIT/OFFSET</code> in SQL, but cursor-based pagination is more efficient because it doesn't require re-scanning skipped rows.</p>
+    </div>
+
+    <h3 id="public-internal">Public vs Internal Surface Area</h3>
+    <p>The same codebase serves both external clients (customers) and internal services (other Octus teams). Filtering happens at two layers:</p>
+
+    <p><strong>Layer 1: Data item status</strong></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Status</th><th>Who can access</th></tr></thead>
+        <tbody>
+          <tr><td><code>INTERNAL_EXTERNAL</code></td><td>Everyone — public and internal</td></tr>
+          <tr><td><code>INTERNAL</code></td><td>Internal tokens only</td></tr>
+          <tr><td><code>SYSTEM</code></td><td>Internal + explicitly allowlisted apps only</td></tr>
+          <tr><td><code>DISABLED</code></td><td>Nobody</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Layer 2: Product grants</strong></p>
+    <p>Even for <code>INTERNAL_EXTERNAL</code> fields, some datasets require a product grant in the token. <code>INTEL_DATA</code> is an example — the user's JWT must contain <code>ProductGrant.INTEL_DATA</code> (id=46), otherwise the retriever rejects the request. This lets the business grant/revoke access to data products without any code changes.</p>
+
+    <p><strong>Layer 3: The public decorator</strong></p>
+
+    <p class="code-label">web/api/decorators.py</p>
+    <pre><code class="language-python">def validate_public_request_includes_auth(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        auth_ctx = kwargs.get("auth_ctx")
+        # Public requests MUST have a valid token
+        if auth_ctx and auth_ctx.is_public and auth_ctx.principal is None:
+            raise DataApiException(status_code=401, message="Unauthorized")
+        return await func(*args, **kwargs)
+    return wrapper</code></pre>
+
+    <p>Internal requests can technically work without a token (service-to-service calls that don't carry user context). Public requests always need one.</p>
+  </section>
+
+  <!-- ── Section 5 ─────────────────────────────────────────────── -->
+  <section id="factory">
+    <h2><span class="section-num">5</span>The Factory Pattern</h2>
+
+    <h3 id="the-problem">The Problem It Solves</h3>
+    <p>DAPI serves 20+ datasets, each backed by a different database or service (Postgres, MySQL, Snowflake, an external API). The endpoint handlers don't need to know which database each dataset uses — they ask the factory for data and the factory figures out the rest.</p>
+
+    <p>Without the factory pattern, every endpoint would need this:</p>
+
+    <pre><code class="language-python"># Without factory — every endpoint needs a giant switch
+if dataset_type_id == 11:
+    result = await intel_retriever.fetch(request)
+elif dataset_type_id == 12:
+    result = await instrument_retriever.fetch(request)
+elif dataset_type_id == 18:
+    result = await carpo_retriever.fetch(request)
+# ... 20 more elif blocks, updated every time a dataset is added</code></pre>
+
+    <p>With the factory, every endpoint does this:</p>
+
+    <pre><code class="language-python"># With factory — completely decoupled from retriever implementations
+retriever_factory = RetrieverFactory()
+results = await retriever_factory.fetch_single(retriever_request)</code></pre>
+
+    <h3 id="resolution">How the Factory Resolves Retrievers</h3>
+    <p>No big <code>if/elif</code> block. Instead: a database lookup to get a retriever name, then Python's <code>getattr</code> for dynamic dispatch.</p>
+
+    <p><strong>Step 1: DB lookup</strong></p>
+
+    <p class="code-label">retriever/RetrieverFactory.py</p>
+    <pre><code class="language-python">retriever_name = name_map.get(data_item_id)   # e.g. "IntelDataRetriever" (string from DB)
+retriever_class = getattr(data_api.retriever, retriever_name)   # the actual Python class</code></pre>
+
+    <p><strong>Step 2: Dynamic import via <code>getattr</code></strong></p>
+    <p><code>data_api/retriever/__init__.py</code> imports all retriever classes, making them attributes of the <code>data_api.retriever</code> module. <code>getattr(module, "IntelDataRetriever")</code> returns the class object itself.</p>
+
+    <pre><code class="language-python"># data_api/retriever/__init__.py  (simplified)
+from data_api.retriever.intel_data_retriever.intel_data_retriever import IntelDataRetriever
+from data_api.retriever.deal_lens_retriever.deal_lens_retriever import DealLensRetriever
+from data_api.retriever.carpo_data_retriever.carpo_data_retriever import CarpoDataRetriever
+# ... all retrievers imported here — makes them accessible via getattr</code></pre>
+
+    <p><strong>Step 3: Instantiate and call</strong></p>
+
+    <pre><code class="language-python">retriever = retriever_class()          # IntelDataRetriever()
+result = await retriever.fetch(data_request)</code></pre>
+
+    <p><strong>Why this is elegant:</strong> Adding a new dataset means writing a retriever class, adding one import to <code>__init__.py</code>, and adding a DB row. Zero changes to the factory or endpoint handlers.</p>
+
+    <div class="callout warning">
+      <p class="callout-label">Codebase gotcha</p>
+      <p>The <code>__init__.py</code> import trick is why <code>autoflake</code> (the pre-commit linter) silently breaks things — it sees those imports as "unused" and strips them. Always commit <code>__init__.py</code> with <code>--no-verify</code>. See CLAUDE.md for the full workflow.</p>
+    </div>
+
+    <h3 id="abc">The Abstract Base Class Contract</h3>
+    <p>Every retriever implements the same interface, defined by an abstract base class. The factory doesn't know or care what's inside <code>IntelDataRetriever.fetch()</code> — it just knows <code>fetch()</code> exists and returns a <code>RetrieverOutput</code>.</p>
+
+    <pre><code class="language-python"># data_api/retriever/DataRetriever.py  (simplified)
+from abc import ABC, abstractmethod
+
+class DataRetriever(ABC):
+    retriever_identifier_types: set[IdentifierType]   # which identifier types it accepts
+
+    @abstractmethod
+    async def fetch(self, input: RetrieverInput) -> RetrieverOutput:
+        ...   # every subclass must implement this
+
+    async def validate_permissions(self, permissions: Permissions) -> None:
+        pass   # default: no check; subclasses override when needed</code></pre>
+
+    <p>This is the <strong>Strategy pattern</strong>: the algorithm (how to fetch intel data from Postgres) is encapsulated inside the strategy class (<code>IntelDataRetriever</code>), and the factory is the context that picks which strategy to use based on the request.</p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── End-to-end ────────────────────────────────────────────── -->
+  <section id="end-to-end">
+    <h2>Putting It All Together</h2>
+    <p>Trace one request end-to-end using everything above:</p>
+
+    <pre><code class="language-json">POST /api/v3/data/list
+Authorization: Bearer &lt;token&gt;
+
+{
+  "ids": [{"value": "12345", "identifier_type": "entity_id"}],
+  "data_item_names": ["ARTICLE_FULL_HTML"],
+  "page_size": 10
+}</code></pre>
+
+    <div class="flow">
+1.  <span class="highlight">Router</span> matches path → calls get_data_v3()
+
+2.  <span class="highlight">Pydantic</span> deserializes + validates JSON body → V3APIRequest object
+
+3.  <span class="highlight">Depends(resolve_auth)</span> runs
+      → validates JWT against Octus Auth SDK
+      → returns AuthContext(is_public=True, product_grants=[46, ...])
+
+4.  <span class="highlight">@validate_public_request_includes_auth</span> decorator
+      → is_public=True and principal exists → passes
+
+5.  <span class="highlight">@validate_public_data_item</span> decorator
+      → checks ARTICLE_FULL_HTML is INTERNAL_EXTERNAL status → passes
+
+6.  <span class="highlight">v3_api_request_to_retriever_input()</span>
+      → converts API request → RetrieverInput(is_public=True, product_grants=[46])
+
+7.  <span class="highlight">RetrieverFactory.fetch_single()</span>
+      → resolves "ARTICLE_FULL_HTML" name → data_item_id 301
+      → looks up data_item_id 301 → retriever_name "IntelDataRetriever"
+      → getattr(data_api.retriever, "IntelDataRetriever") → the class
+      → IntelDataRetriever().validate_permissions()
+           → checks ProductGrant.INTEL_DATA in product_grants → passes
+      → IntelDataRetriever().fetch(retriever_input)
+           → queries Postgres → returns rows
+
+8.  <span class="highlight">retriever_output_to_api_response()</span>
+      → converts rows → APIResponse
+
+9.  <span class="highlight">FastAPI</span> serializes APIResponse → JSON → HTTP 200</div>
+  </section>
+
+  <!-- ── Reading next ───────────────────────────────────────────── -->
+  <section id="reading-next">
+    <h2>What to Read Next</h2>
+    <p>Now that you have the mental model, read these files in order — you'll recognize every pattern. Around 600 lines total.</p>
+
+    <div class="reading-item">
+      <span class="reading-num">01</span>
+      <div class="reading-body">
+        <strong>data_api/web/api/auth.py</strong>
+        <span>Full file (~280 lines). You've seen most of it in excerpts — read it end-to-end now. Pay attention to how legacy header support was kept without breaking the new path.</span>
+      </div>
+    </div>
+
+    <div class="reading-item">
+      <span class="reading-num">02</span>
+      <div class="reading-body">
+        <strong>data_api/web/api/v3/data/views.py</strong>
+        <span>Two route handlers, ~115 lines. Notice how thin they are — the framework does almost all the work.</span>
+      </div>
+    </div>
+
+    <div class="reading-item">
+      <span class="reading-num">03</span>
+      <div class="reading-body">
+        <strong>data_api/retriever/RetrieverFactory.py</strong>
+        <span>Focus on <code>fetch_single()</code> and <code>get_retriever_classes_from_data_items()</code>. The rest is scaffolding.</span>
+      </div>
+    </div>
+
+    <div class="reading-item">
+      <span class="reading-num">04</span>
+      <div class="reading-body">
+        <strong>data_api/retriever/intel_data_retriever/intel_data_retriever.py</strong>
+        <span>A concrete retriever. See how <code>validate_permissions()</code> and <code>fetch()</code> are implemented. ~120 lines.</span>
+      </div>
+    </div>
+
+    <div class="reading-item">
+      <span class="reading-num">05</span>
+      <div class="reading-body">
+        <strong>data_api/web/api/v2/data/schema.py</strong>
+        <span>The full request/response Pydantic models. Study <code>FilterGroup</code> for a complex nested model example — it's a recursive structure worth understanding.</span>
+      </div>
+    </div>
+
+    <hr class="nav-divider" style="margin: 2rem 0;">
+
+    <p style="color: var(--text-muted); font-size: 0.9rem;"><strong>Concepts not covered here</strong> (good follow-up topics): SQLAlchemy async ORM · Redis caching patterns · Flyway DB migrations · Datadog metrics instrumentation · Python async context vars</p>
+  </section>
+
+</article>
+</main>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('section[id], h3[id]');
+  const navLinks = document.querySelectorAll('.nav-list a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector(`.nav-list a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
