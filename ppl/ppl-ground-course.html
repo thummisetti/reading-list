@@ -34,13 +34,13 @@
       const parsedIndex = new DOMParser().parseFromString(notesIndexHtml, 'text/html');
       const noteLinks = {};
 
-      parsedIndex.querySelectorAll('a[href$=".html"]').forEach(link => {
-        const text = link.textContent.trim();
-        const match = text.match(/^(\d+(?:\.\d+)?)\b/);
-        const href = link.getAttribute('href');
-        if (match && href && !href.endsWith('index.html')) {
-          noteLinks[match[1].replace(/^0+(?=\d)/, '')] = href;
-        }
+      parsedIndex.querySelectorAll('.lesson').forEach(row => {
+        const rawNumber = row.querySelector('.num')?.textContent.trim();
+        const link = row.querySelector('a[href$=".html"]');
+        const href = link?.getAttribute('href');
+        if (!rawNumber || !href) return;
+        const number = rawNumber.replace(/^0+(?=\d)/, '');
+        noteLinks[number] = href;
       });
 
       const notesJs = `
