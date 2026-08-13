@@ -4,81 +4,1803 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PPL Ground Course — Reading List</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f9f8f6; --surface: #ffffff; --border: #e5e3df;
+      --text: #1a1917; --text-muted: #6b6860;
+      --accent: #2563eb; --accent-light: #dbeafe;
+      --green: #16a34a; --green-light: #dcfce7; --green-border: #86efac;
+      --amber: #d97706; --amber-light: #fef3c7;
+      --purple: #7c3aed; --purple-light: #ede9fe;
+      --red: #dc2626; --red-light: #fee2e2;
+      --teal: #0d9488; --teal-light: #ccfbf1;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", Consolas, monospace;
+    }
+    html { font-size: 16px; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6; }
+
+    /* ── Top bar ─────────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .breadcrumb { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .progress-wrap { display: flex; align-items: center; gap: 0.6rem; }
+    .progress-bar { width: 140px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--green); border-radius: 3px; width: 0%; transition: width 0.3s; }
+    .progress-text { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+    /* ── Page ────────────────────────────────────────────── */
+    .page { max-width: 1160px; margin: 0 auto; padding: 2rem 1.5rem 8rem; }
+    .page-header { margin-bottom: 1.75rem; }
+    .page-header h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.35rem; }
+    .page-header p { color: var(--text-muted); max-width: 540px; font-size: 0.9rem; }
+
+    /* ── Resources strip ─────────────────────────────────── */
+    .resources {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem; margin-bottom: 2rem;
+    }
+    .resources-label {
+      font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-muted); margin-bottom: 0.55rem;
+    }
+    .resource-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .rl {
+      font-size: 0.77rem; font-weight: 600; padding: 0.22rem 0.6rem;
+      border-radius: 5px; text-decoration: none; transition: opacity 0.15s;
+    }
+    .rl:hover { opacity: 0.78; }
+    .rl-phak { background: var(--accent-light); color: var(--accent); }
+    .rl-afh  { background: var(--teal-light);   color: var(--teal); }
+    .rl-aim  { background: var(--purple-light);  color: var(--purple); }
+    .rl-far  { background: var(--red-light);     color: var(--red); }
+    .rl-acug { background: var(--amber-light);   color: var(--amber); }
+    .rl-ac   { background: #f3f4f6; color: #374151; }
+    .rl-sup  { background: #f3f4f6; color: #374151; }
+
+    /* ── Two-column layout ───────────────────────────────── */
+    .layout { display: grid; grid-template-columns: 196px 1fr; gap: 2.5rem; align-items: start; }
+
+    /* ── Sidebar ─────────────────────────────────────────── */
+    .sidebar {
+      position: sticky; top: 3.5rem;
+      max-height: calc(100vh - 5rem); overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .sb-progress {
+      background: var(--green-light); border: 1px solid var(--green-border);
+      border-radius: 8px; padding: 0.7rem; margin-bottom: 1.1rem; text-align: center;
+    }
+    .sb-progress .spn { font-size: 1.5rem; font-weight: 800; color: var(--green); line-height: 1; }
+    .sb-progress .spl { font-size: 0.68rem; color: #15803d; margin-top: 0.15rem; }
+    .sb-label {
+      font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--text-muted); padding: 0.5rem 0.5rem 0.2rem;
+    }
+    .sb-nav { list-style: none; }
+    .sb-nav li a {
+      display: block; font-size: 0.78rem; padding: 0.28rem 0.5rem; border-radius: 5px;
+      text-decoration: none; color: var(--text-muted);
+      transition: background 0.12s, color 0.12s;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sb-nav li a:hover { background: var(--accent-light); color: var(--accent); }
+    .sb-nav li a.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+    /* ── Chapter ─────────────────────────────────────────── */
+    .chapter { margin-bottom: 4rem; }
+    .chapter-hd {
+      display: flex; align-items: center; gap: 0.7rem;
+      border-bottom: 2px solid var(--border); padding-bottom: 0.7rem; margin-bottom: 0.85rem;
+    }
+    .ch-num {
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      background: var(--text); color: white; padding: 0.18rem 0.45rem; border-radius: 4px;
+    }
+    .ch-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+    .ch-intro { color: var(--text-muted); font-size: 0.87rem; margin-bottom: 1.25rem; max-width: 600px; }
+
+    /* ── Lesson card ─────────────────────────────────────── */
+    .lesson {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1rem 1.25rem; margin-bottom: 0.75rem; transition: border-color 0.15s;
+    }
+    .lesson.done { border-color: var(--green-border); background: #f0fdf4; }
+    .lesson-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 0.75rem; margin-bottom: 0.75rem;
+    }
+    .lesson-title-wrap { display: flex; align-items: baseline; gap: 0.5rem; flex: 1; min-width: 0; }
+    .l-num { font-size: 0.67rem; font-family: var(--mono); color: var(--text-muted); flex-shrink: 0; }
+    .l-title { font-size: 0.97rem; font-weight: 700; }
+    .done-btn {
+      flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--border); background: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: transparent; transition: all 0.15s;
+    }
+    .done-btn:hover { border-color: var(--green); }
+    .lesson.done .done-btn { background: var(--green); border-color: var(--green); color: white; }
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.75rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.8rem;
+      border-radius: 6px; text-decoration: none; cursor: pointer;
+      border: none; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.82; }
+    .btn-video   { background: var(--accent); color: white; }
+
+    .btn-notes {
+      background: white;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+    }
+    .btn-notes:hover {
+      background: var(--accent-light);
+      opacity: 1;
+    }
+
+    .btn-quiz    { background: white; color: var(--green); border: 1.5px solid var(--green); }
+    .btn-quiz:hover    { background: var(--green-light); opacity: 1; }
+    .btn-podcast { background: white; color: var(--purple); border: 1.5px solid var(--purple); }
+    .btn-podcast:hover { background: var(--purple-light); opacity: 1; }
+    .btn-sqz     { background: var(--amber); color: white; font-size: 0.83rem; padding: 0.45rem 1rem; }
+    .btn-ptest   { background: var(--accent); color: white; font-size: 0.88rem; padding: 0.5rem 1.1rem; }
+
+    /* ── Reading list ────────────────────────────────────── */
+    .reading-label {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.35rem;
+    }
+    .reading-list { list-style: none; display: flex; flex-direction: column; gap: 0.28rem; }
+    .reading-item { display: flex; align-items: baseline; gap: 0.45rem; font-size: 0.82rem; color: var(--text-muted); }
+    .src {
+      font-size: 0.6rem; font-weight: 700; padding: 0.08rem 0.32rem; border-radius: 3px;
+      font-family: var(--mono); flex-shrink: 0; letter-spacing: 0.02em;
+    }
+    .src.phak { background: var(--accent-light); color: var(--accent); }
+    .src.afh  { background: var(--teal-light);   color: var(--teal); }
+    .src.aim  { background: var(--purple-light);  color: var(--purple); }
+    .src.far  { background: var(--red-light);     color: var(--red); }
+    .src.acug { background: var(--amber-light);   color: var(--amber); }
+    .src.ac   { background: #f3f4f6; color: #374151; }
+
+    /* ── Section quiz / podcasts ─────────────────────────── */
+    .sqz-block {
+      margin-top: 1rem; padding: 0.9rem 1.1rem;
+      background: var(--amber-light); border: 1px solid #fcd34d; border-radius: 10px;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .sqz-block p { font-size: 0.84rem; font-weight: 600; color: #92400e; }
+    .pod-block {
+      margin-top: 1rem; padding: 0.9rem 1.1rem;
+      background: var(--purple-light); border: 1px solid #c4b5fd; border-radius: 10px;
+    }
+    .pod-label {
+      font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--purple); margin-bottom: 0.55rem;
+    }
+    .pod-links { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+
+    /* ── Practice tests ──────────────────────────────────── */
+    .ptest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
+    .ptest-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.1rem; text-align: center; text-decoration: none; color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .ptest-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+    .ptest-card .pti { font-size: 1.8rem; margin-bottom: 0.4rem; }
+    .ptest-card .ptt { font-weight: 700; font-size: 0.93rem; }
+    .ptest-card .ptc { font-size: 0.77rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+    /* ── Callout ─────────────────────────────────────────── */
+    .callout {
+      background: var(--accent-light); border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0; padding: 0.7rem 0.9rem; margin-bottom: 1.5rem;
+      font-size: 0.86rem; color: #1e3a8a;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .layout { display: block; }
+      .sidebar { display: none; }
+      .progress-wrap { display: none; }
+    }
+  </style>
 </head>
 <body>
-  <noscript>
-    <main style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;max-width:720px;margin:4rem auto;padding:0 1.5rem">
-      <h1>PPL Ground Course</h1>
-      <p>JavaScript is required for the integrated course page.</p>
-      <p><a href="lesson-notes/index.html">Open lesson notes</a></p>
+
+<!-- ── Top bar ──────────────────────────────────────────────── -->
+<div class="topbar">
+  <nav class="breadcrumb">
+    <a href="../">Reading List</a> &rsaquo; <a href="./">PPL Exam Prep</a> &rsaquo; Ground Course
+  </nav>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    <span class="progress-text" id="prog-text">0 / 64</span>
+  </div>
+</div>
+
+<!-- ── Page ─────────────────────────────────────────────────── -->
+<div class="page">
+
+  <div class="page-header">
+    <h1>PPL Premium Ground Course</h1>
+    <p>Josh Campbell · Free Pilot Training &mdash; 11 chapters, 64 lessons (including lesson 35.2). Watch, read, quiz. Mark each lesson done as you go.</p>
+  </div>
+
+  <!-- ── FAA Resources ──────────────────────────────────────── -->
+  <div class="resources">
+    <div class="resources-label">FAA Resources — open these for reading assignments</div>
+    <div class="resource-links">
+      <a class="rl rl-phak" href="https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/phak" target="_blank">PHAK — Pilot's Handbook of Aeronautical Knowledge</a>
+      <a class="rl rl-afh"  href="https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook" target="_blank">AFH — Airplane Flying Handbook</a>
+      <a class="rl rl-aim"  href="https://www.faa.gov/Air_traffic/publications/atpubs/aim_html/index.html" target="_blank">AIM — Aeronautical Information Manual</a>
+      <a class="rl rl-far"  href="https://www.faa.gov/regulations_policies/faa_regulations" target="_blank">FARs — Federal Aviation Regulations</a>
+      <a class="rl rl-acug" href="https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/aero_guide/" target="_blank">ACUG — Aeronautical Chart User's Guide</a>
+      <a class="rl rl-ac"   href="https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentID/1035868" target="_blank">AC 120-27</a>
+      <a class="rl rl-sup"  href="https://www.faa.gov/sites/faa.gov/files/training_testing/testing/supplements/sport_rec_private_akts.pdf" target="_blank">Testing Supplement (PDF)</a>
+    </div>
+  </div>
+
+  <!-- ── Two-column ────────────────────────────────────────── -->
+  <div class="layout">
+
+    <!-- ── Sidebar ─────────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sb-progress">
+        <div class="spn" id="sb-done">0</div>
+        <div class="spl">of 64 lessons done</div>
+      </div>
+      <div class="sb-label">Chapters</div>
+      <ul class="sb-nav">
+        <li><a href="#ch1">1 · Aerodynamics</a></li>
+        <li><a href="#ch2">2 · Airspace</a></li>
+        <li><a href="#ch3">3 · Basic Navigation</a></li>
+        <li><a href="#ch4">4 · Aircraft Instruments</a></li>
+        <li><a href="#ch5">5 · ATC &amp; NAVAIDs</a></li>
+        <li><a href="#ch6">6 · Weather</a></li>
+        <li><a href="#ch7">7 · X/C Nav &amp; Performance</a></li>
+        <li><a href="#ch8">8 · Documents You Need</a></li>
+        <li><a href="#ch9">9 · Regulations</a></li>
+        <li><a href="#ch10">10 · Aircraft Maintenance</a></li>
+        <li><a href="#ch11">11 · Operating an Airplane</a></li>
+        <li><a href="#practice">Practice Tests</a></li>
+      </ul>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────── -->
+    <main>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 1: AERODYNAMICS
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch1">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 1</span>
+          <span class="ch-title">Aerodynamics</span>
+        </div>
+        <p class="ch-intro">Understanding aerodynamics is central to controlling the airplane. As you study this material, keep that in mind — it will make a huge difference when you start training in the aircraft.</p>
+
+        <!-- Lesson 1 -->
+        <div class="lesson" id="l1">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">01</span>
+              <span class="l-title">The Four Forces</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l1')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=pe5Fx6QxSc4" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/01-four-forces.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/Es6eoewRzdJLPeLj7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5–5-8 &nbsp;Forces Acting on the Airplane — Weight</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 2 -->
+        <div class="lesson" id="l2">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">02</span>
+              <span class="l-title">Creating Lift</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l2')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=-FmHg04rleg" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/02-creating-lift.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/Ltd1PQqhLYTCRRur8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 4-5–4-9 &nbsp;Theories in the Production of Lift — A Third Dimension</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 3 -->
+        <div class="lesson" id="l3">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">03</span>
+              <span class="l-title">What Causes a Stall?</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l3')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=hIv-BLf6PoE" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/03-what-causes-a-stall.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/D7ApC8VaxRe6cpSL9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-25–5-28 &nbsp;Stalls — Angle of Attack Indicators</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 5-9–5-21 &nbsp;Angle of Attack — Elevator Trim Stall</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 4 -->
+        <div class="lesson" id="l4">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">04</span>
+              <span class="l-title">What Causes a Spin?</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l4')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=jAFgYWqvfuA" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/04-what-causes-a-spin.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/BcaLqXC64EZv7bnm9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 5-22–5-26 &nbsp;Spin Awareness — Spiral Dive</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 5 -->
+        <div class="lesson" id="l5">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">05</span>
+              <span class="l-title">Controlling the Airplane</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l5')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=aOxFKDOn5dY" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/05-controlling-the-airplane.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/e5vxiM2Ec6v5cKnu7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-12–5-14 &nbsp;Axes of an Aircraft — Moment and Moment Arm</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 3-1–3-5 &nbsp;Introduction — Attitude Flying</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 6 -->
+        <div class="lesson" id="l6">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">06</span>
+              <span class="l-title">Airplane Stability</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l6')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=2t6tT77QFW4" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/06-airplane-stability.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/8FdhjGBYyvuuwKV77" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-14–5-22 &nbsp;Aircraft Design Characteristics — Effect of Wing Planform</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 3-6–3-8 &nbsp;Straight and Level Flight</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 7 -->
+        <div class="lesson" id="l7">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">07</span>
+              <span class="l-title">Airplane Controllability</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l7')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=dEJqNcEI8tI" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/07-airplane-controllability.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/yTjdeiNhLRZuR3PSA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 6-2–6-8 &nbsp;Flight Control Systems — V-Tail</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 3-5–3-10 &nbsp;Integrated Flight Instruments — Trim Control</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 8 -->
+        <div class="lesson" id="l8">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">08</span>
+              <span class="l-title">Using Flaps</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l8')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=7S8yxrlulSA" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/08-using-flaps.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/BTeiWwQ3sKqyZUB76" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 6-8–6-12 &nbsp;Secondary Flight Controls — Chapter Summary</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 9-1–9-2 &nbsp;Use of Flaps</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 9 -->
+        <div class="lesson" id="l9">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">09</span>
+              <span class="l-title">What Makes an Airplane Turn?</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l9')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=xz8x9e6t1SA" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/09-what-makes-an-airplane-turn.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/QNUPgNirn4VXdYf47" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-22–5-25 &nbsp;Aerodynamic Forces in Flight Maneuvers — Forces in Descents</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 3-11–3-21 &nbsp;Level Turns — Descents and Descending Turns</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 10 -->
+        <div class="lesson" id="l10">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">10</span>
+              <span class="l-title">Load Factor Explained</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l10')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=F-umUhlp4n4" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/10-load-factor-explained.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/DVqq6Nspo4DiVtop8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-33–5-40 &nbsp;Load Factors — Radius of Turn</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 11 -->
+        <div class="lesson" id="l11">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">11</span>
+              <span class="l-title">Calculating Load Factor</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l11')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=UoqHq9YC6Rk" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/11-calculating-load-factor.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/d5kHjYVJuYViZbc28" target="_blank">Take Quiz</a>
+          </div>
+        </div>
+
+        <!-- Lesson 12 -->
+        <div class="lesson" id="l12">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">12</span>
+              <span class="l-title">V-Speeds Explained</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l12')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=TX5eFcLlE1o" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/12-v-speeds-explained.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/Ae9XrpnezJszkCi86" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-8–8-10 &nbsp;Airspeed Indicator — Instrument Check</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 13 -->
+        <div class="lesson" id="l13">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">13</span>
+              <span class="l-title">Left Turning Tendencies</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l13')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=AsMTDyCaot0" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/13-left-turning-tendencies.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/2egxwt2iKaT5FZzK7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-30–5-32 &nbsp;Torque and P-Factor — Asymmetric Loading (P-Factor)</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 6-3–6-5 &nbsp;Normal Takeoff — Lift Off</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 14 -->
+        <div class="lesson" id="l14">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap">
+              <span class="l-num">14</span>
+              <span class="l-title">Flying in Ground Effect</span>
+            </div>
+            <button class="done-btn" onclick="toggleDone('l14')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=ATrffK4Yp4c" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/14-flying-in-ground-effect.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/LW5iQkxsrdBviBT8A" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 5-11–5-12 &nbsp;Ground Effect</li>
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 6-10–6-11 &nbsp;Ground Effect on Takeoff</li>
+            <li class="reading-item"><span class="src afh">AFH</span> p. 9-12 &nbsp;Ground Effect (landing)</li>
+          </ul>
+        </div>
+
+        <!-- Podcasts -->
+        <div class="pod-block">
+          <div class="pod-label">Study on the Go — Spotify Podcasts</div>
+          <div class="pod-links">
+            <a class="btn btn-podcast" href="https://open.spotify.com/episode/6mdarmtKpJ9ZoMzT7x4vob" target="_blank">&#127911; Lessons 1–3</a>
+            <a class="btn btn-podcast" href="https://open.spotify.com/episode/2HT8ZnOyTg8p5m9O5clnlE" target="_blank">&#127911; Lessons 4–6</a>
+            <a class="btn btn-podcast" href="https://open.spotify.com/episode/6gMsX3g2w5rDZqkTnNkU5J" target="_blank">&#127911; Lessons 7–9</a>
+            <a class="btn btn-podcast" href="https://open.spotify.com/episode/1R7Iwgg7Aw6IIY4iXoyrFC" target="_blank">&#127911; Lessons 10–12</a>
+            <a class="btn btn-podcast" href="https://open.spotify.com/episode/2ap3CI8yel7qk0Ra1IwwVK" target="_blank">&#127911; Lessons 13–14</a>
+          </div>
+        </div>
+
+        <!-- Section quiz -->
+        <div class="sqz-block">
+          <p>Chapter 1 Section Quiz — Aerodynamics</p>
+          <a class="btn btn-sqz" href="https://forms.gle/gtzpojDNUhswUrHWA" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 2: AIRSPACE
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch2">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 2</span>
+          <span class="ch-title">Airspace</span>
+        </div>
+        <p class="ch-intro">Airspace could be the most important thing you learn as a pilot. Many decisions depend on the type of airspace you'll be flying in — examiners love asking about it.</p>
+
+        <!-- Lesson 15 -->
+        <div class="lesson" id="l15">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">15</span><span class="l-title">Types of Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l15')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=YVsyBO133sA" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/15-types-of-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/5kkFMpbYCRt65e8AA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 15–15-3 &nbsp;Introduction — Uncontrolled Airspace</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-1-1 to 3-1-4 &nbsp;General — Basic VFR Weather Minimums</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-2-1 &nbsp;Controlled Airspace (General)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 16 -->
+        <div class="lesson" id="l16">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">16</span><span class="l-title">Class B Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l16')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=gS9RgkRIPZ4" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/16-class-b-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/znEnr9nHU3B4MwDG7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 15-9 &nbsp;Class B — Operating Rules and Pilot/Equipment Requirements</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-2-3 &nbsp;Class B Airspace</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.131 &nbsp;Operations in Class B Airspace</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 17 -->
+        <div class="lesson" id="l17">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">17</span><span class="l-title">Class C Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l17')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=M-2VWNQ2Ukk" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/17-class-c-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/k7KNpJ2duNr2vtQK8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 15-9–15-10 &nbsp;Class C — Operating Rules and Pilot/Equipment Requirements</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-2-4 &nbsp;Class C Airspace</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.130 &nbsp;Operations in Class C Airspace</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 18 -->
+        <div class="lesson" id="l18">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">18</span><span class="l-title">Class D Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l18')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=wYH4gQ-pOmE" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/18-class-d-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/7sPoENfqwfr31Bsu9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 15-10 &nbsp;Class D — Operating Rules and Pilot/Equipment Requirements</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-2-5 &nbsp;Class D Airspace</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.129 &nbsp;Operations in Class D Airspace</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 19 -->
+        <div class="lesson" id="l19">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">19</span><span class="l-title">Class E Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l19')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=PEeUvw1i9hs" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/19-class-e-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/7Z3srmCipthzD6T76" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 15-10 &nbsp;Class E — Operating Rules and Pilot/Equipment Requirements</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-2-6 &nbsp;Class E Airspace</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.127 &nbsp;Operations in Class E Airspace</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 20 -->
+        <div class="lesson" id="l20">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">20</span><span class="l-title">Class G Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l20')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=0Liq4ZB5m6U" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/20-class-g-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/mbckEaEVHpZbCrHw7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 15-10–15-11 &nbsp;Class G — Operating Rules and Pilot/Equipment Requirements</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-3-1 to 3-3-2 &nbsp;Class G Airspace</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.126 &nbsp;Operations in Class G Airspace</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 21 -->
+        <div class="lesson" id="l21">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">21</span><span class="l-title">Special Use Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l21')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=doKwv3ylx8E" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/21-special-use-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/XWYnUAL2qVkcvHDT6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 15-3–15-4 &nbsp;Special Use Airspace</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-4-1 to 3-4-9 &nbsp;Special Use Airspace</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.133 &nbsp;Restricted and Prohibited Areas</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 22 -->
+        <div class="lesson" id="l22">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">22</span><span class="l-title">Other Airspace</span></div>
+            <button class="done-btn" onclick="toggleDone('l22')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=MOqtfy45qKQ" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/22-other-airspace.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/4yDF2C85HqbGsVF37" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 15-4–15-7 &nbsp;Other Airspace Areas</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §3-5-1 to 3-5-10 &nbsp;Other Airspace Areas</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.137–91.145 &nbsp;Temporary Flight Restrictions</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 2 Section Quiz — Airspace</p>
+          <a class="btn btn-sqz" href="https://forms.gle/EaYMvDKj9VqK7Eu96" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 3: BASIC NAVIGATION
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch3">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 3</span>
+          <span class="ch-title">Basic Navigation</span>
+        </div>
+        <p class="ch-intro">With a basic understanding of airspace, we can talk about what you need to navigate — or "find your way" — in an airplane.</p>
+
+        <!-- Lesson 23 -->
+        <div class="lesson" id="l23">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">23</span><span class="l-title">What is Zulu Time?</span></div>
+            <button class="done-btn" onclick="toggleDone('l23')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=a7KYDQOAeFk" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/23-what-is-zulu-time.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/txnj8UpPatQPnCLP6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-3–16-5 &nbsp;Time Zones</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-2-12 &nbsp;Time</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 24 -->
+        <div class="lesson" id="l24">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">24</span><span class="l-title">Latitude and Longitude</span></div>
+            <button class="done-btn" onclick="toggleDone('l24')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=AaI_DjRwnhk" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/24-latitude-and-longitude.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/48QheGNPUFKDt4SeA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 16-3 &nbsp;Latitude and Longitude</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 3-13 &nbsp;Global Positioning System (GPS)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 25 -->
+        <div class="lesson" id="l25">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">25</span><span class="l-title">The VFR Sectional — Airports</span></div>
+            <button class="done-btn" onclick="toggleDone('l25')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=TMkqcorBcdU" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/25-vfr-sectional-airports.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/4oXSXNCq1hRmL8wi7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16–16-3 &nbsp;Introduction — World Aeronautical Charts</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §9-1-1 to 9-1-4 (A.2) &nbsp;Aeronautical Charts and Related Publications — VFR Terminal</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 26 -->
+        <div class="lesson" id="l26">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">26</span><span class="l-title">The VFR Sectional — Altitudes</span></div>
+            <button class="done-btn" onclick="toggleDone('l26')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=5KpJzNHLe-M" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/26-vfr-sectional-altitudes.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/oNM13r9snR2J15Bq8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src acug">ACUG</span> pp. 11–48 &nbsp;Explanation of VFR Terms and Symbols</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 27 -->
+        <div class="lesson" id="l27">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">27</span><span class="l-title">The VFR Sectional — Navigation</span></div>
+            <button class="done-btn" onclick="toggleDone('l27')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=Kohx5s6BCRQ" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/27-vfr-sectional-navigation.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/XYHea1p5nasbvdoo6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src acug">ACUG</span> pp. 59–60 &nbsp;Airspace</li>
+            <li class="reading-item"><span class="src acug">ACUG</span> VFR Chart Legend &nbsp;Read through all notes in the legend</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 3 Section Quiz — Basic Navigation</p>
+          <a class="btn btn-sqz" href="https://forms.gle/ja5vYuun9wcDHw1R8" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 4: AIRCRAFT INSTRUMENTS
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch4">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 4</span>
+          <span class="ch-title">Aircraft Instruments</span>
+        </div>
+        <p class="ch-intro">To control your airplane with precision, you need to know how aircraft instrument systems work and how to use them.</p>
+
+        <!-- Lesson 28 -->
+        <div class="lesson" id="l28">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">28</span><span class="l-title">The Heading Indicator</span></div>
+            <button class="done-btn" onclick="toggleDone('l28')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=JySkSwAnwos" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/28-heading-indicator.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/NE1t2VKwdM8Wrw279" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-15–8-16 &nbsp;Gyroscopic Flight Instruments — Sources of Power</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-19–8-22 &nbsp;Heading Indicator — Remote Indicating Compass</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.205 &nbsp;Instrument and Equipment Requirements</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 29 -->
+        <div class="lesson" id="l29">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">29</span><span class="l-title">The Attitude Indicator</span></div>
+            <button class="done-btn" onclick="toggleDone('l29')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=ZBU55yIje-Y" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/29-attitude-indicator.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/moCZq4Vyyhuistg56" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-18–8-19 &nbsp;Attitude Indicator</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.205 &nbsp;Instrument and Equipment Requirements</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 30 -->
+        <div class="lesson" id="l30">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">30</span><span class="l-title">The Turn Coordinator</span></div>
+            <button class="done-btn" onclick="toggleDone('l30')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=_SvHsQZdMZ8" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/30-turn-coordinator.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/wmrzwWRQc7Kunat78" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-16–8-18 &nbsp;Turn Indicators — Instrument Check</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.205 &nbsp;Instrument and Equipment Requirements</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 31 -->
+        <div class="lesson" id="l31">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">31</span><span class="l-title">The Pitot-Static System</span></div>
+            <button class="done-btn" onclick="toggleDone('l31')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=QkfC43VTZaE" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/31-pitot-static-system.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/dVsu8WcDA49CS4cE7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8–8-2 &nbsp;Introduction — Static Pressure Chamber and Lines</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-10–8-11 &nbsp;Blockage of the Pitot-Static System — Blocked Static System</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 32 -->
+        <div class="lesson" id="l32">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">32</span><span class="l-title">The Altimeter</span></div>
+            <button class="done-btn" onclick="toggleDone('l32')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=q27N5EFWmpM" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/32-altimeter.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/R8fRgxiGFWQGCBhLA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-3–8-7 &nbsp;Altimeter — Instrument Check</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.205 &nbsp;Instrument and Equipment Requirements</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 33 -->
+        <div class="lesson" id="l33">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">33</span><span class="l-title">The Magnetic Compass</span></div>
+            <button class="done-btn" onclick="toggleDone('l33')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=WC-iOlckdf4" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/33-magnetic-compass.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/7MLcjx9C1HjQQo1X6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-23–8-27 &nbsp;Compass Systems — Eddy Current Damping</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.205 &nbsp;Instrument and Equipment Requirements</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 34 -->
+        <div class="lesson" id="l34">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">34</span><span class="l-title">Digital Instruments</span></div>
+            <button class="done-btn" onclick="toggleDone('l34')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=oWxeAqcNSJU" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/34-digital-instruments.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/dFAZiAonCYHmY8sT6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 8-12–8-14 &nbsp;Electronic Flight Display — Trend Vectors</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 4 Section Quiz — Aircraft Instruments</p>
+          <a class="btn btn-sqz" href="https://forms.gle/1jQm8bPkuwdRyMWt6" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 5: USING ATC & NAVAIDS
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch5">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 5</span>
+          <span class="ch-title">Using ATC &amp; NAVAIDs</span>
+        </div>
+        <p class="ch-intro">Radio communication is one of the biggest struggles for new pilots. These lessons cover how to use ATC, radios, and NAVAIDs to make things easier.</p>
+
+        <!-- Lesson 35 -->
+        <div class="lesson" id="l35">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">35</span><span class="l-title">Don't Be Afraid of ATC!</span></div>
+            <button class="done-btn" onclick="toggleDone('l35')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=ndHyt1fbBcM" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/35-dont-be-afraid-of-atc.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/7f4FMm8GUgAnRJiz8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 15-7 &nbsp;ATC and the National Airspace System</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 14-22–14-26 &nbsp;Radio Communications — Radar Traffic Advisories</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-1-1 to 4-1-3 &nbsp;Air Route Traffic Control Centers — Flight Service Stations</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-2-1 to 4-2-10 &nbsp;Radio Communications Phraseology and Techniques — Altitudes and Flight Levels</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-14 &nbsp;Communications</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 35.2 -->
+        <div class="lesson" id="l36">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">35.2</span><span class="l-title">Non-Towered Radio Calls</span></div>
+            <button class="done-btn" onclick="toggleDone('l36')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=-_xBS6vTO9E" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/35-2-non-towered-radio-calls.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/RTtKzYo19jfG9wtw6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 14-2–14-3 &nbsp;Non-Towered Airport</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-1-9 &nbsp;Traffic Advisory Practices at Airports Without Operating Control Towers</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 36 -->
+        <div class="lesson" id="l37">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">36</span><span class="l-title">What is ATIS?</span></div>
+            <button class="done-btn" onclick="toggleDone('l37')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=0JRVTlLJ7hk" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/36-what-is-atis.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/zkBLwPzQ2y4FSZfY6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 14-5 &nbsp;Automated Terminal Information Service (ATIS)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-1-13 &nbsp;Automated Flight Information Service — AFIS (Alaska students)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 37 -->
+        <div class="lesson" id="l38">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">37</span><span class="l-title">How to Use VORs</span></div>
+            <button class="done-btn" onclick="toggleDone('l38')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=6S95qXQNTzM" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/37-how-to-use-vors.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/8J3KJQ5bgggUVJpZ9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-22–16-26 &nbsp;Ground Based Navigation — Tips on Using the VOR</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.171 &nbsp;VOR Equipment Check for IFR Operations</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §1-1-3 &nbsp;VHF Omni-Directional Range (VOR)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §1-1-4 &nbsp;VOR Receiver Check</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 38 -->
+        <div class="lesson" id="l39">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">38</span><span class="l-title">GPS Navigation Explained</span></div>
+            <button class="done-btn" onclick="toggleDone('l39')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=yh73ip84M4I" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/38-gps-navigation-explained.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/Z3TxxwLCARZ6Fj4J9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-30–16-34 &nbsp;Global Positioning System — VFR Waypoints</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §1-1-17 &nbsp;Global Positioning System (GPS)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §1-1-18 &nbsp;Wide Area Augmentation System (WAAS)</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 5 Section Quiz — Using ATC and NAVAIDs</p>
+          <a class="btn btn-sqz" href="https://forms.gle/aPXNXmhSAnBGP1mu9" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 6: WEATHER
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch6">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 6</span>
+          <span class="ch-title">Weather</span>
+        </div>
+        <p class="ch-intro">Weather can get you into trouble faster than almost anything else when flying. Pilots need a solid understanding of weather and weather products.</p>
+
+        <!-- Lesson 39 -->
+        <div class="lesson" id="l40">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">39</span><span class="l-title">Weather Basics</span></div>
+            <button class="done-btn" onclick="toggleDone('l40')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=A4eIGJrntXg" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/39-weather-basics.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/u7WokDTZ1yCMRbVP7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 12-1–12-25 &nbsp;Weather Theory (full chapter)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-1 &nbsp;National Weather Service Aviation Weather Service Program</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 40 -->
+        <div class="lesson" id="l41">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">40</span><span class="l-title">TAFs and METARs</span></div>
+            <button class="done-btn" onclick="toggleDone('l41')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=DCJ7HbF1zWQ" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/40-tafs-and-metars.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/bRFkZnymSZyDiXov7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 13-1–13-2 &nbsp;Introduction — Surface Aviation Weather Observations</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 13-5–13-9 &nbsp;Aviation Weather Reports — Terminal Aerodrome Forecasts (TAF)</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.103 &nbsp;Preflight Action</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-10 &nbsp;Weather Observing Programs</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-3 &nbsp;Use of Aviation Weather Products</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 41 -->
+        <div class="lesson" id="l42">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">41</span><span class="l-title">X/C Weather &amp; Winds Aloft</span></div>
+            <button class="done-btn" onclick="toggleDone('l42')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=aMsLBdnxiWg" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/41-xc-weather-and-winds-aloft.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/ScuVZdhVeyFERJv46" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 13-13 &nbsp;Winds and Temperature Aloft Forecast (FB)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-4 &nbsp;Graphical Forecasts for Aviation (GFA)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 42 -->
+        <div class="lesson" id="l43">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">42</span><span class="l-title">PIREPs</span></div>
+            <button class="done-btn" onclick="toggleDone('l43')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=BHIPomiLvYg" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/42-pireps.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/F1uAnuAkW99XGz3q9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 13-8 &nbsp;Pilot Weather Reports (PIREPs)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-18 &nbsp;Pilot Weather Reports</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 43 -->
+        <div class="lesson" id="l44">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">43</span><span class="l-title">Prog Charts Explained</span></div>
+            <button class="done-btn" onclick="toggleDone('l44')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=D2gBdygxgW0" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/43-prog-charts-explained.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/3wzL2gi6bghsb2sYA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 13-13–13-16 &nbsp;Weather Charts — Significant Weather Prognostic Charts</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-4 &nbsp;Graphical Forecasts for Aviation (GFA)</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 6 Section Quiz — Weather</p>
+          <a class="btn btn-sqz" href="https://forms.gle/iLiK6fkg8bD1Tufd9" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 7: X/C NAVIGATION & PERFORMANCE
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch7">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 7</span>
+          <span class="ch-title">X/C Navigation &amp; Performance</span>
+        </div>
+        <p class="ch-intro">More complicated topics that are critical to understand if you want to arrive alive. Cross-country planning, weight &amp; balance, and aircraft performance.</p>
+
+        <!-- Lesson 44 -->
+        <div class="lesson" id="l45">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">44</span><span class="l-title">Flight Service Stations</span></div>
+            <button class="done-btn" onclick="toggleDone('l45')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=pvBNaSMaFd8" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/44-flight-service-stations.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/xgXjvu5jkRvzB8NR9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 13-4 &nbsp;Flight Service Station (FSS)</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 2-23–2-24 &nbsp;External Resources</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 13-11–13-13 &nbsp;Inflight Weather Advisories — Convective SIGMET</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-2 &nbsp;FAA Weather Services</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-6 &nbsp;Inflight Aviation Weather Advisories</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 45 -->
+        <div class="lesson" id="l46">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">45</span><span class="l-title">Weather Hazards</span></div>
+            <button class="done-btn" onclick="toggleDone('l46')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=FoGmomeNVb8" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/45-weather-hazards.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/2wcMf2Sc5CzTEEKP9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> p. 12-11 &nbsp;Low Level Wind Shear</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 12-22–12-25 &nbsp;Thunderstorms — Engine Water Ingestion</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-24 &nbsp;Microbursts</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §7-1-26 &nbsp;Thunderstorms</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 46 -->
+        <div class="lesson" id="l47">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">46</span><span class="l-title">X/C Nav Log Explained</span></div>
+            <button class="done-btn" onclick="toggleDone('l47')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=Ydvev6B7IaY" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/46-xc-nav-log-explained.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/tDExWujGRWAZ7rFE7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-5–16-13 &nbsp;Measurement of Direction — Dead Reckoning</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-17–16-21 &nbsp;Flight Planning — Steps in Charting the Course</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 47 -->
+        <div class="lesson" id="l48">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">47</span><span class="l-title">How to Use an E6B</span></div>
+            <button class="done-btn" onclick="toggleDone('l48')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=L8ORGN6zZog" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/47-how-to-use-an-e6b.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/9NvojLzLQewuHqLR8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-11–16-12 &nbsp;Basic Calculations — Plotter</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 48 -->
+        <div class="lesson" id="l49">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">48</span><span class="l-title">The 60:1 Rule</span></div>
+            <button class="done-btn" onclick="toggleDone('l49')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=QXz9sMUdbZ0" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/48-the-60-1-rule.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/8Hgb6sF7D23EesBB6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item" style="font-style:italic;">No reading assignment for this lesson.</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 49 -->
+        <div class="lesson" id="l50">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">49</span><span class="l-title">How to Fly Cross Country</span></div>
+            <button class="done-btn" onclick="toggleDone('l50')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=2tIYJyRldzM" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/49-how-to-fly-cross-country.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/uS5LxTzJjyahX8A88" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 16-34–16-35 &nbsp;Lost Procedures — Flight Diversion</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.103 &nbsp;Preflight Action</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.151 &nbsp;Fuel Requirements for Flight in VFR Conditions</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.159 &nbsp;VFR Cruising Altitude or Flight Level</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 50 -->
+        <div class="lesson" id="l51">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">50</span><span class="l-title">Weight and Balance</span></div>
+            <button class="done-btn" onclick="toggleDone('l51')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=ix_BShDvvts" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/50-weight-and-balance.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/qwWTPFnRCmcpaVUk6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 10-1–10-11 &nbsp;Introduction — Chapter Summary</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.9 &nbsp;Civil Aircraft Flight Manual, Marking, and Placard Requirements</li>
+            <li class="reading-item"><span class="src ac">AC</span> AC 120-27 &nbsp;Read paragraph 1.6.1 (skim entire document)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 51 -->
+        <div class="lesson" id="l52">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">51</span><span class="l-title">Aircraft Performance</span></div>
+            <button class="done-btn" onclick="toggleDone('l52')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=RMitIgzeSgo" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/51-aircraft-performance.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/jLc4iN4xN5WtZ6qK6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 11-1–11-28 &nbsp;Introduction — Stall Speed Performance Charts</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.103 &nbsp;Preflight Action</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 7 Section Quiz — X/C Navigation &amp; Performance</p>
+          <a class="btn btn-sqz" href="https://forms.gle/3B7yHbtge226J5XH9" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 8: DOCUMENTS YOU NEED
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch8">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 8</span>
+          <span class="ch-title">Documents You Need</span>
+        </div>
+        <p class="ch-intro">You must know required documents to become a pilot — ARROW, medical certificates, and pilot privileges &amp; limitations.</p>
+
+        <!-- Lesson 52 -->
+        <div class="lesson" id="l53">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">52</span><span class="l-title">Required Documents</span></div>
+            <button class="done-btn" onclick="toggleDone('l53')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=AKFVSq94_Cg" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/52-required-documents.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/XSWX6umXiWd3NyodA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 9-1–9-8 &nbsp;Introduction — Airworthiness Certificate</li>
+            <li class="reading-item"><span class="src far">FAR</span> 61.3(a) &nbsp;Requirement for Certificates, Ratings, and Authorizations</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.9 &nbsp;Civil Aircraft Flight Manual, Marking, and Placard Requirements</li>
+            <li class="reading-item"><span class="src far">FAR</span> 61.23 &nbsp;Medical Certificates: Requirement and Duration</li>
+            <li class="reading-item"><span class="src far">FAR</span> 61.60 &nbsp;Change of Address</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.203 &nbsp;Civil Aircraft: Certifications Required</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 53 -->
+        <div class="lesson" id="l54">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">53</span><span class="l-title">BasicMed</span></div>
+            <button class="done-btn" onclick="toggleDone('l54')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=pzAqxNSqv8w" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/53-basicmed.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/pdeDrhHtCkBt5Fmd8" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src far">FAR</span> 61.113 &nbsp;Private Pilot Privileges and Limits (read section I to the end)</li>
+            <li class="reading-item"><span class="src far">FAR</span> Part 68 &nbsp;Requirements for Operating Certain Small Aircraft Without a Medical Certificate</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 54 -->
+        <div class="lesson" id="l55">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">54</span><span class="l-title">Privileges &amp; Limitations</span></div>
+            <button class="done-btn" onclick="toggleDone('l55')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=n0KrBfRJD0A" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/54-privileges-and-limitations.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/B7eVj2edFsG3o2r88" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 1-16–1-18 &nbsp;Pilot Certifications — Airline Transport Pilot</li>
+            <li class="reading-item"><span class="src far">FAR</span> 61.31 &nbsp;Type Rating Requirements, Additional Rating, and Authorization Requirements</li>
+            <li class="reading-item"><span class="src far">FAR</span> 61.113 &nbsp;Private Pilot Privileges and Limitations: Pilot in Command</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 8 Section Quiz — Documents You Need</p>
+          <a class="btn btn-sqz" href="https://forms.gle/SPBGAV3CXry8P5dA9" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 9: REGULATIONS
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch9">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 9</span>
+          <span class="ch-title">Regulations</span>
+        </div>
+        <p class="ch-intro">Knowing the regulations is important for staying safe and legal. Two lessons covering collision avoidance and safety rules.</p>
+
+        <!-- Lesson 55 -->
+        <div class="lesson" id="l56">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">55</span><span class="l-title">Avoiding a Crash</span></div>
+            <button class="done-btn" onclick="toggleDone('l56')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=uowNUuqzVyY" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/55-avoiding-a-crash.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/ue8zuHeWzZAe1ZMSA" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 14-28–14-38 &nbsp;Collision Avoidance — Pilot Considerations</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §8-1-8 &nbsp;Judgment Aspects of Collision Avoidance</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.13 &nbsp;Careless or Reckless Operation</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.111 &nbsp;Operating Near Other Aircraft</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.113 &nbsp;Right-of-Way Rules (except water operations)</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.115 &nbsp;Right-of-Way Rules: Water Operations</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.119 &nbsp;Minimum Safe Altitudes: General</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.121 &nbsp;Altimeter Settings</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.209 &nbsp;Aircraft Lights</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 56 -->
+        <div class="lesson" id="l57">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">56</span><span class="l-title">Safety Regulations</span></div>
+            <button class="done-btn" onclick="toggleDone('l57')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=v1ARrbrbkaI" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/56-safety-regulations.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/SHtr3bc2TtihE8Re7" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src far">FAR</span> 91.15 &nbsp;Dropping Objects</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.17 &nbsp;Alcohol or Drugs</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.19 &nbsp;Carriage of Narcotic Drugs</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.107 &nbsp;Use of Safety Belts, Shoulder Harnesses, and Child Restraint Systems</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.117 &nbsp;Aircraft Speed</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.207 &nbsp;Emergency Locator Transmitters</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.211 &nbsp;Supplemental Oxygen</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 9 Section Quiz — Regulations</p>
+          <a class="btn btn-sqz" href="https://forms.gle/mZytf5rmoV5K8TA19" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 10: AIRCRAFT MAINTENANCE
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch10">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 10</span>
+          <span class="ch-title">Aircraft Maintenance</span>
+        </div>
+        <p class="ch-intro">Knowing whether your aircraft is airworthy is critical. This chapter covers maintenance requirements, inspections, and the regulations behind them.</p>
+
+        <!-- Lesson 57 -->
+        <div class="lesson" id="l58">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">57</span><span class="l-title">Maintenance Basics</span></div>
+            <button class="done-btn" onclick="toggleDone('l58')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=EfJspfZfjKM" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/57-maintenance-basics.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/WHNRioTdGG26XjMw6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 9-8–9-13 &nbsp;Aircraft Inspections — Chapter Summary</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.7 &nbsp;Civil Aircraft Airworthiness</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.213 &nbsp;Inoperative Instruments and Equipment</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.401–91.405 &nbsp;Applicability / General / Maintenance Required</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.407 &nbsp;Operation After Maintenance, Preventive Maintenance, Rebuilding, or Alteration</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.409 &nbsp;Inspections</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.411 &nbsp;Altimeter System and Altitude Reporting Equipment Tests and Inspections</li>
+            <li class="reading-item"><span class="src far">FAR</span> 91.417 &nbsp;Maintenance Records</li>
+            <li class="reading-item"><span class="src far">FAR</span> Part 43 Appendix A &nbsp;(required)</li>
+            <li class="reading-item"><span class="src far">FAR</span> 43.3 / 43.5 / 43.7 &nbsp;Persons authorized to perform / approve maintenance (if time permits)</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 10 Section Quiz — Maintenance Basics</p>
+          <a class="btn btn-sqz" href="https://forms.gle/2omsrDgDbY4e4buc8" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           CHAPTER 11: OPERATING AN AIRPLANE
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="ch11">
+        <div class="chapter-hd">
+          <span class="ch-num">Chapter 11</span>
+          <span class="ch-title">Operating an Airplane</span>
+        </div>
+        <p class="ch-intro">The transition into the actual flying part of training — airport operations, physiology, aircraft systems, and traffic patterns.</p>
+
+        <!-- Lesson 58 -->
+        <div class="lesson" id="l59">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">58</span><span class="l-title">NOTAMs &amp; the Chart Supplement</span></div>
+            <button class="done-btn" onclick="toggleDone('l59')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=LC9-PgdDFmo" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/58-notams-and-chart-supplement.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/P8FDGdxoBq4KNKNA9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 14-3–14-5 &nbsp;Chart Supplement — Notices to Airmen (NOTAM)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 59 -->
+        <div class="lesson" id="l60">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">59</span><span class="l-title">Aircraft Physiology &amp; Risk Management</span></div>
+            <button class="done-btn" onclick="toggleDone('l60')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=1J5g3G7A4N8" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/59-aircraft-physiology-and-risk-management.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/35SnYFCywEJsJGwq5" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 17-1–17-29 &nbsp;Introduction — Chapter Summary (full chapter)</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 60 -->
+        <div class="lesson" id="l61">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">60</span><span class="l-title">Operating an Airplane</span></div>
+            <button class="done-btn" onclick="toggleDone('l61')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=sxeBngtzvz0" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/60-operating-an-airplane.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/BYqp9x54qbY3FP846" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 7-1–7-11 &nbsp;Introduction — Fuel Injection Systems</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 7-15–7-20 &nbsp;Ignition System — Combustion</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 7-25–7-29 &nbsp;Airframe Systems — Combustion Heating Systems</li>
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 7-30–7-42 &nbsp;Electrical System — Chapter Summary</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 61 -->
+        <div class="lesson" id="l62">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">61</span><span class="l-title">Airport Markings &amp; Lighting</span></div>
+            <button class="done-btn" onclick="toggleDone('l62')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=Yacx4jNQlgo" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/61-airport-markings-and-lighting.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/1SkjmZATjJhkEnpS9" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 14-5–14-10 &nbsp;Airport Markings and Signs — New Lighting Technologies</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-3 &nbsp;Runway End Identifier Lights (REIL)</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-4 &nbsp;Runway Edge Light Systems</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-5 &nbsp;In-Runway Lighting</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-7 &nbsp;Control of Lighting Systems</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-8 &nbsp;Pilot Control of Airport Lighting</li>
+            <li class="reading-item"><span class="src aim">AIM</span> Chapter 2 §3 &nbsp;Airport Marking Aids and Signs</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 62 -->
+        <div class="lesson" id="l63">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">62</span><span class="l-title">Traffic Patterns</span></div>
+            <button class="done-btn" onclick="toggleDone('l63')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=OvR3VQKEIr0" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/62-traffic-patterns.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/REwYtjCA25usnBSd6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src phak">PHAK</span> pp. 14-20–14-38 &nbsp;Wind Direction Indicators — Chapter Summary</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-1 &nbsp;Approach Lighting Systems</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §2-1-2 &nbsp;Visual Glide Slope Indicators</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-3 &nbsp;Traffic Patterns</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-5 &nbsp;Unexpected Maneuvers in the Airport Traffic Pattern</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-10 &nbsp;Intersection Takeoffs</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-11 &nbsp;LAHSO Operations</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-12 &nbsp;Low Approach</li>
+            <li class="reading-item"><span class="src aim">AIM</span> §4-3-21 &nbsp;Exiting the Runway After Landing</li>
+          </ul>
+        </div>
+
+        <!-- Lesson 63 -->
+        <div class="lesson" id="l64">
+          <div class="lesson-top">
+            <div class="lesson-title-wrap"><span class="l-num">63</span><span class="l-title">Taxiing in Strong Winds</span></div>
+            <button class="done-btn" onclick="toggleDone('l64')" title="Mark done">&#10003;</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-video" href="https://www.youtube.com/watch?v=tPiBZMRxU3o" target="_blank">&#9654; Watch Video</a>
+            <a class="btn btn-notes" href="lesson-notes/63-taxiing-in-strong-winds.html">&#128214; Read Notes</a>
+            <a class="btn btn-quiz"  href="https://forms.gle/XbFDryS9MiLRETpL6" target="_blank">Take Quiz</a>
+          </div>
+          <div class="reading-label">Reading</div>
+          <ul class="reading-list">
+            <li class="reading-item"><span class="src afh">AFH</span> pp. 2-18–2-21 &nbsp;Taxiing</li>
+          </ul>
+        </div>
+
+        <div class="sqz-block">
+          <p>Chapter 11 Section Quiz — Operating an Airplane</p>
+          <a class="btn btn-sqz" href="https://forms.gle/181YAmArZASnpcb96" target="_blank">Open Quiz</a>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════
+           PRACTICE TESTS
+           ════════════════════════════════════════════════════ -->
+      <section class="chapter" id="practice">
+        <div class="chapter-hd">
+          <span class="ch-num">Final Step</span>
+          <span class="ch-title">Practice Tests</span>
+        </div>
+        <p class="ch-intro">These are for practice only — they will not give you an endorsement for the FAA written exam. Use the link in your purchase email to take the endorsed test when you're ready (must score 90%+).</p>
+        <div class="callout">The endorsement link is in your purchase confirmation email. Only use that link when you're ready — the endorsement is emailed to you after passing at 90%.</div>
+        <div class="ptest-grid">
+          <a class="ptest-card" href="https://forms.gle/JSUzMQVRZm9UiVGL7" target="_blank">
+            <div class="pti">&#128196;</div>
+            <div class="ptt">Quick Test 1</div>
+            <div class="ptc">50 questions</div>
+          </a>
+          <a class="ptest-card" href="https://forms.gle/MUSYPtzpRKqf67pR7" target="_blank">
+            <div class="pti">&#128196;</div>
+            <div class="ptt">Quick Test 2</div>
+            <div class="ptc">50 questions</div>
+          </a>
+          <a class="ptest-card" href="https://forms.gle/m9e8mJyef5v7VvF2A" target="_blank">
+            <div class="pti">&#128221;</div>
+            <div class="ptt">Long Test 1</div>
+            <div class="ptc">100 questions</div>
+          </a>
+          <a class="ptest-card" href="https://forms.gle/qH4mBoM42q6acfqo9" target="_blank">
+            <div class="pti">&#128221;</div>
+            <div class="ptt">Long Test 2</div>
+            <div class="ptc">100 questions</div>
+          </a>
+        </div>
+      </section>
+
     </main>
-  </noscript>
-  <script>
-    const courseSource = 'https://raw.githubusercontent.com/thummisetti/reading-list/166bcff4ec075e1a56716a98dfe17c7608df9195/ppl/ppl-ground-course.html';
+  </div><!-- /.layout -->
+</div><!-- /.page -->
 
-    const notesCss = `
-      .btn-notes { background: white; color: var(--accent); border: 1.5px solid var(--accent); }
-      .btn-notes:hover { background: var(--accent-light); opacity: 1; }
-    `;
+<script>
+  const TOTAL = 64;
 
-    Promise.all([
-      fetch(courseSource).then(response => {
-        if (!response.ok) throw new Error('Unable to load course content');
-        return response.text();
-      }),
-      fetch('lesson-notes/index.html').then(response => {
-        if (!response.ok) throw new Error('Unable to load notes index');
-        return response.text();
-      })
-    ]).then(([courseHtml, notesIndexHtml]) => {
-      const parsedIndex = new DOMParser().parseFromString(notesIndexHtml, 'text/html');
-      const noteLinks = {};
+  function toggleDone(id) {
+    const el = document.getElementById(id);
+    const isDone = el.classList.toggle('done');
+    localStorage.setItem('ppl-' + id, isDone ? '1' : '');
+    updateProgress();
+  }
 
-      parsedIndex.querySelectorAll('.lesson').forEach(row => {
-        const rawNumber = row.querySelector('.num')?.textContent.trim();
-        const link = row.querySelector('a[href$=".html"]');
-        const href = link?.getAttribute('href');
-        if (!rawNumber || !href) return;
-        const number = rawNumber.replace(/^0+(?=\d)/, '');
-        noteLinks[number] = href;
-      });
+  function updateProgress() {
+    let done = 0;
+    for (let i = 1; i <= TOTAL; i++) {
+      if (localStorage.getItem('ppl-l' + i) === '1') done++;
+    }
+    const pct = Math.round((done / TOTAL) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-text').textContent = done + ' / ' + TOTAL;
+    document.getElementById('sb-done').textContent = done;
+  }
 
-      const notesJs = `
-        (() => {
-          const noteLinks = ${JSON.stringify(noteLinks)};
-          document.querySelectorAll('.lesson').forEach(card => {
-            const rawNumber = card.querySelector('.l-num')?.textContent.trim();
-            const number = rawNumber ? rawNumber.replace(/^0+(?=\\d)/, '') : '';
-            const href = noteLinks[number];
-            const actions = card.querySelector('.actions');
-            if (!href || !actions || actions.querySelector('.btn-notes')) return;
+  function restoreProgress() {
+    for (let i = 1; i <= TOTAL; i++) {
+      if (localStorage.getItem('ppl-l' + i) === '1') {
+        const el = document.getElementById('l' + i);
+        if (el) el.classList.add('done');
+      }
+    }
+    updateProgress();
+  }
 
-            const link = document.createElement('a');
-            link.className = 'btn btn-notes';
-            link.href = 'lesson-notes/' + href.replace(/^\\.\\//, '');
-            link.innerHTML = '&#128214; Read Notes';
-
-            const quiz = actions.querySelector('.btn-quiz');
-            if (quiz) actions.insertBefore(link, quiz);
-            else actions.appendChild(link);
-          });
-        })();
-      `;
-
-      courseHtml = courseHtml.replace('</head>', `<style>${notesCss}</style></head>`);
-      courseHtml = courseHtml.replace('</body>', `<script>${notesJs}<\/script></body>`);
-
-      document.open();
-      document.write(courseHtml);
-      document.close();
-    }).catch(error => {
-      document.body.innerHTML = `
-        <main style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;max-width:720px;margin:4rem auto;padding:0 1.5rem">
-          <h1>PPL Ground Course</h1>
-          <p>${error.message}.</p>
-          <p><a href="lesson-notes/index.html">Open lesson notes</a></p>
-        </main>`;
+  // Scroll spy
+  const sections = document.querySelectorAll('.chapter, #practice');
+  const navLinks = document.querySelectorAll('.sb-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id);
+        });
+      }
     });
-  </script>
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  restoreProgress();
+</script>
 </body>
 </html>
